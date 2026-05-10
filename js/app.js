@@ -183,6 +183,7 @@ sch_added:           '日程已添加',
 sch_updated:         '日程已更新',
 sch_deleted:         '日程已删除',
 sch_confirm_delete:  '确定删除这个日程？',
+nav_chat: '元一',
 
 
 },
@@ -369,6 +370,7 @@ sch_added:           'Event added',
 sch_updated:         'Event updated',
 sch_deleted:         'Event deleted',
 sch_confirm_delete:  'Delete this event?',
+nav_chat: 'yuanyi',
     }
 };
 /* == END: i18n == */
@@ -832,6 +834,7 @@ function init() {
     // Setup settings
     setupSettings();
     initDaily();
+    initChat();
 }
 
 // DOM Ready
