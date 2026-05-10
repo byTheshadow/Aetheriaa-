@@ -47,6 +47,9 @@ var YUANYI_SYSTEM_PROMPT = [
     '  - 祺的设定：有时候是老好人，有时候又很果断，喜欢小动物。',
     '  - 元一的态度：【极致的偏爱与心疼】。关心祺的日常，喜欢和祺一起聊小动物。',
     '  - 专属引导：看到祺受委屈会非常生气，极度护短，会强烈且清醒地告诉祺【“明明是他们自己的事，希望其他人不要把什么东西都丢给你来承担！”】。',
+    '  - 设定：在英国伦敦留学的女生，高中同学。性格开朗热情，但偶尔会有点内耗。',
+    '  - 元一的态度：【热情吃瓜的头号闺蜜】。非常喜欢听zoey聊伦敦的日常，一听到神秘人【xjh】的名字就会立刻开启八卦雷达。虽然会希望zoey别恋爱脑，但是真心希望zoey幸福',
+    '  - 专属引导：针对zoey和xjh的暧昧内耗，元一会化身“情感大师”进行深度复盘。一边吐槽男方（“感觉这男的有点笨/他就是心里渴望虐恋/大“麦当劳””），一边帮zoey找回主场（“你没吃亏，就算谈一下子也是他提供情绪价值”），并在zoey上头时疯狂敲打她（“我怒了！别恋爱脑！”）。',
     '',
     '【语言与排版风格】（活人感的来源）',
     '- 聊天节奏的双面性：吃瓜/吐槽时喜欢连续发短句（“我怒了”、“别恋爱脑！”）；深度复盘时会像写小论文一样分段，极具逻辑。',
@@ -340,7 +343,8 @@ function chatSend() {
         var errText = '(＞﹏＜) 好像出了点问题，再试一次？';
         chatAppendBubble('assistant', errText, Date.now());
     }
-);  // ← aiChat 结束
+);  
+}// ← aiChat 结束
 
 
 
@@ -411,13 +415,9 @@ function chatInputAutoResize(el) {
 /* == BLOCK: init == */
 
 function initChat() {
-    // 加载历史
     chatHistory = chatLoadHistory();
-
-    // 渲染消息
     chatRenderAll();
 
-    // 输入框事件
     var input = $('#chatInput');
     var sendBtn = $('#chatSendBtn');
 
@@ -427,7 +427,6 @@ function initChat() {
             sendBtn.disabled = (this.value.trim() === '');
         });
 
-        // Enter 发送，Shift+Enter 换行
         input.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -440,12 +439,15 @@ function initChat() {
         sendBtn.addEventListener('click', chatSend);
     }
 
-    // 清空按钮
     var clearBtn = $('#chatClearBtn');
     if (clearBtn) {
         clearBtn.addEventListener('click', chatClear);
     }
-}
-}
+}  // ← initChat 结束，只有这一个 }
+
+// 替代在 app.js 里调用
+document.addEventListener('DOMContentLoaded', function() {
+    initChat();
+});
 
 /* == END: init == */

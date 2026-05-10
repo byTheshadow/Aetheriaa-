@@ -834,7 +834,6 @@ function init() {
     // Setup settings
     setupSettings();
     initDaily();
-    initChat();
 }
 
 // DOM Ready
