@@ -259,57 +259,77 @@ function chatSend() {
     var aiBubbleEl = null;
 
     aiChat(
-        messages,
-        // onChunk：流式接收
-        function(chunk) {
-            aiContent += chunk;
+    messages,
+    // onChunk：流式接收
+    function(chunk) {
+        aiContent += chunk;
 
-            // 第一个 chunk 到来时，移除打字动画，创建真实气泡
-            if (!aiBubbleEl) {
-                var typing = document.getElementById('chatTypingBubble');
-                if (typing) typing.remove();
-
-                aiBubbleEl = chatCreateBubble('assistant', '', aiTs);
-                if (container) {
-                    container.appendChild(aiBubbleEl);
-                }
-            }
-
-            // 更新气泡文字
-            var bubbleText = aiBubbleEl.querySelector('.chat-bubble');
-            if (bubbleText) bubbleText.textContent = aiContent;
-            chatScrollToBottom();
-        },
-        // onDone：流结束
-        function() {
-            chatIsTyping = false;
-            chatUpdateStatus('在线 · 随时陪你');
-
-            // 如果没有收到任何 chunk（非流式 fallback）
-            if (!aiBubbleEl) {
-                var typing = document.getElementById('chatTypingBubble');
-                if (typing) typing.remove();
-                chatAppendBubble('assistant', aiContent, aiTs);
-            }
-
-            // 保存 AI 回复到历史
-            var aiMsg = { role: 'assistant', content: aiContent, ts: aiTs };
-            chatHistory.push(aiMsg);
-            chatSaveHistory(chatHistory);
-        },
-        // onError
-        function(err) {
-            chatIsTyping = false;
-            chatUpdateStatus('在线 · 随时陪你');
-
+        if (!aiBubbleEl) {
             var typing = document.getElementById('chatTypingBubble');
             if (typing) typing.remove();
 
-            var errText = '(＞﹏＜) 好像出了点问题，再试一次？';
-            chatAppendBubble('assistant', errText, Date.now());
+            aiBubbleEl = chatCreateBubble('assistant', '', aiTs);
+            if (container) {
+                container.appendChild(aiBubbleEl);
+            }
         }
-    );
-}
+
+        var bubbleText = aiBubbleEl.querySelector('.chat-bubble');
+        if (bubbleText) bubbleText.textContent = aiContent;
+        chatScrollToBottom();
+    },
+    // onDone：流结束
+    function() {
+        chatIsTyping = false;
+
+        // 移除流式气泡（如果有）
+        if (aiBubbleEl) {
+            aiBubbleEl.remove();
+            aiBubbleEl = null;
+        }
+
+        // 移除打字动画（fallback）
+        var typing = document.getElementById('chatTypingBubble');
+        if (typing) typing.remove();
+
+        // 按换行拆分，过滤空行
+        var parts = aiContent.split('\n').filter(function(line) {
+            return line.trim() !== '';
+        });
+
+        // 逐段延迟显示，每段间隔 400ms
+        var delay = 0;
+        for (var i = 0; i < parts.length; i++) {
+            (function(text, d, isLast) {
+                setTimeout(function() {
+                    chatAppendBubble('assistant', text, aiTs);
+
+                    if (isLast) {
+                        chatUpdateStatus('在线 · 随时陪你');
+                        var aiMsg = { role: 'assistant', content: aiContent, ts: aiTs };
+                        chatHistory.push(aiMsg);
+                        chatSaveHistory(chatHistory);
+                    }
+                }, d);
+            })(parts[i], delay, i === parts.length - 1);
+
+            delay += 400;
+        }
+    },
+    // onError
+    function(err) {
+        chatIsTyping = false;
+        chatUpdateStatus('在线 · 随时陪你');
+
+        var typing = document.getElementById('chatTypingBubble');
+        if (typing) typing.remove();
+
+        var errText = '(＞﹏＜) 好像出了点问题，再试一次？';
+        chatAppendBubble('assistant', errText, Date.now());
+    }
+);  // ← aiChat 结束
+
+
 
 /* == END: send == */
 
