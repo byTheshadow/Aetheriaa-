@@ -446,5 +446,6 @@ function initChat() {
         clearBtn.addEventListener('click', chatClear);
     }
 }
+}
 
 /* == END: init == */
